@@ -1,15 +1,51 @@
-import './App.css';
+import React,{useState} from 'react';
 import firebase from './utils/Firebase';
 import "firebase/compat/auth";
-function App() {
+import Auth from './pages/Auth';
+
+const App = () =>{
+
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   firebase.auth().onAuthStateChanged(currentUser => {
-    console.log(currentUser?'Estamos logueados':'No estamos logueados');
+
+    if(!currentUser){
+      setUser(null)
+    } else{
+      setUser(currentUser)
+    }
+    setIsLoading(false);
   })
+
+  if(isLoading){
+    return null;
+  }
+
   return (
-    <div className="App">
-      <h1>React + Electron</h1>
-    </div>
+    !user ? <Auth/>:<UserLogged/>
   );
 }
+
+const UserLogged = () => {
+  const logout = ()=>{
+    firebase.auth().signOut();
+  }
+
+  return (
+    <div
+      style={{
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+        height: "100vh",
+        flexDirection:"column",
+      }}>
+        <h1> Usuario Logeado</h1>
+        <button onClick={logout}>Cerrar Sesión</button>
+    </div>
+  )
+}
+
 
 export default App;
